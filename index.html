@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Registro de Nombre</title>
+  <style>
+    body {
+      margin: 0; padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #6a11cb, #2575fc);
+      height: 100vh; display: flex; justify-content: center; align-items: center;
+    }
+    .card {
+      background: #fff;
+      border-radius: 15px;
+      box-shadow: 0 8px 20px rgba(0,0,0,.2);
+      padding: 30px;
+      width: 100%; max-width: 350px;
+      animation: fadeIn 1s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity:0; transform:translateY(-20px);}
+      to { opacity:1; transform:translateY(0);}
+    }
+    h2 { text-align: center; color: #333; margin-bottom: 20px;}
+    label { font-weight: bold; color:#444; margin-top:10px; display:block;}
+    input {
+      width: 100%; padding: 10px; margin-top:5px;
+      border: 1px solid #ccc; border-radius: 8px;
+      outline:none; transition: 0.3s;
+    }
+    input:focus {
+      border-color: #2575fc; box-shadow: 0 0 6px rgba(37,117,252,.4);
+    }
+    button {
+      margin-top:20px; width:100%;
+      padding: 12px; border:none; border-radius:8px;
+      background: linear-gradient(135deg, #6a11cb, #2575fc);
+      color: #fff; font-size:16px; cursor:pointer;
+      transition: background 0.3s;
+    }
+    button:hover {
+      background: linear-gradient(135deg, #2575fc, #6a11cb);
+    }
+    .mensaje {
+      margin-top:15px; text-align:center; font-weight:bold;
+    }
+    .ok { color: green; }
+    .err { color: red; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>Registrar Nombre</h2>
+    <form id="formRegistro">
+      <label>Nombre</label>
+      <input type="text" id="nombre" required maxlength="100" />
+      <button type="submit">Guardar</button>
+      <div class="mensaje" id="respuesta"></div>
+    </form>
+  </div>
+
+  <script>
+    const form = document.getElementById('formRegistro');
+    const respuesta = document.getElementById('respuesta');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      respuesta.textContent = "Enviando...";
+      respuesta.className = "mensaje";
+
+      const datos = {
+        nombre: document.getElementById('nombre').value.trim()
+      };
+
+      try {
+        const res = await fetch('registrar.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(datos)
+        });
+        const data = await res.json();
+        if (data.ok) {
+          respuesta.textContent = "✅ Nombre registrado (ID: " + data.id + ")";
+          respuesta.className = "mensaje ok";
+          form.reset();
+        } else {
+          respuesta.textContent = "❌ " + data.mensaje;
+          respuesta.className = "mensaje err";
+        }
+      } catch (err) {
+        respuesta.textContent = "❌ Error al conectar con el servidor";
+        respuesta.className = "mensaje err";
+      }
+    });
+  </script>
+</body>
+</html>
